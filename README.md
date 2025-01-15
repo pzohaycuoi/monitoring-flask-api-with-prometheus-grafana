@@ -10,8 +10,32 @@ This project sets up a monitoring stack for a Flask API using Prometheus, Grafan
 - Blackbox Exporter
 
 ## Project Structure
-
-
+```
+.
+├── README.md
+├── alertmanager
+│   └── alertmanager.yml
+├── app
+│   ├── app.py
+│   ├── dockerfile
+│   └── requirements.txt
+├── blackbox
+│   └── blackbox.yml
+├── docker-compose.yml
+├── grafana
+│   ├── dashboards
+│   │   ├── apisuccesserror.json
+│   │   ├── averageresponsetime.json
+│   │   └── noderesources.json
+│   └── provisioning
+│       ├── dashboards
+│       │   └── dashboard.yml
+│       └── datasources
+│           └── datasource.yml
+└── prometheus
+    ├── alertrules.yml
+    └── prometheus.yml
+```
 
 ## Components
 
