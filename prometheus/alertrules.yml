@@ -1,0 +1,54 @@
+  groups:
+  - name: system-metrics
+    rules:
+      - alert: HighCPUUsage
+        expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[2m])) * 100) > 80
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU Usage Detected on {{ $labels.instance }}"
+          description: "CPU usage is above 80% for more than 1 minute."
+
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 90
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High Memory Usage Detected on {{ $labels.instance }}"
+          description: "Memory usage is above 90% for more than 1 minute."
+
+      - alert: HighDiskUsage
+        expr: (node_filesystem_size_bytes{mountpoint="/"} - node_filesystem_free_bytes{mountpoint="/"}) / node_filesystem_size_bytes{mountpoint="/"} * 100 > 80
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High Disk Usage Detected on {{ $labels.instance }}"
+          description: "Disk usage is above 80% on {{ $labels.instance }}."
+
+  - name: api-error-rules
+    rules:
+      - alert: APIServiceError-Requests
+        expr: http_errors_total{instance="app:5050",status_code=~"5.."} > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "API Service returned an HTTP 5xx error"
+          description: "The API ({{ $labels.instance }}) has returned an HTTP 5xx error (e.g., 500, 502, 503)"
+
+  - name: api-scrape-rules
+    rules:
+      - alert: APIServiceError-Scrape
+        expr: probe_http_status_code{instance="app:5050"} != 200
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "API service returned non-200 HTTP status ({{ $labels.instance }})"
+          description: |
+            The API service {{ $labels.instance }} is returning a non-200 HTTP status code.
+            Current Status Code: {{ $value }}
+            Labels: {{ $labels }}
